@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>For Trudy 🐰</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        :root {
+            --pink-light: #ffe6ea;
+            --pink-pop: #ff8fa3;
+            --pink-deep: #ff4d6d;
+            --glass: rgba(255, 255, 255, 0.95); /* Slightly more opaque for better reading */
+            --shadow: 0 10px 40px rgba(255, 77, 109, 0.2);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            /* Restored the soft pink gradient you liked */
+            background: linear-gradient(180deg, var(--pink-light) 0%, #fff 100%);
+            color: #555;
+            height: 100vh;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        /* --- Background Floating Hearts --- */
+        .hearts-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 0; overflow: hidden;
+        }
+
+        /* --- Layout --- */
+        .container {
+            width: 100%; height: 100vh; position: relative;
+            display: flex; justify-content: center; align-items: center; z-index: 1;
+        }
+
+        /* --- Screens --- */
+        .screen {
+            position: absolute; width: 100%; height: 100%;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            padding: 25px; opacity: 0; pointer-events: none;
+            transition: all 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            transform: scale(0.9) translateY(30px);
+        }
+        .screen.active { opacity: 1; pointer-events: all; transform: scale(1) translateY(0); }
+
+        /* --- Aesthetic Components --- */
+        h1 {
+            font-family: 'Pacifico', cursive; font-size: 2.8rem;
+            color: var(--pink-deep); margin-bottom: 15px;
+            text-shadow: 2px 2px 0px rgba(255,255,255,0.6);
+            line-height: 1.2;
+        }
+
+        .card {
+            background: var(--glass); backdrop-filter: blur(20px);
+            border-radius: 30px; padding: 30px; width: 100%; max-width: 360px;
+            box-shadow: var(--shadow); border: 2px solid #fff;
+            position: relative;
+        }
+
+        p { font-size: 1.1rem; line-height: 1.6; margin-bottom: 20px; font-weight: 600; color: #666; }
+
+        .btn {
+            background: linear-gradient(45deg, var(--pink-pop), var(--pink-deep));
+            color: white; border: none; padding: 15px 40px; border-radius: 50px;
+            font-size: 1.1rem; font-family: 'Nunito', sans-serif; font-weight: 700;
+            cursor: pointer; box-shadow: 0 5px 15px rgba(255, 77, 109, 0.3);
+            transition: transform 0.2s; margin-top: 10px;
+        }
+        .btn:active { transform: scale(0.95); }
+
+        /* --- The Reveal Mechanic --- */
+        .game-area {
+            position: relative;
+            width: 100%;
+            min-height: 300px; /* Ensures space for balloons and message */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .balloon-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;
+            width: 100%; max-width: 300px;
+            position: absolute; /* Stacked on top */
+            z-index: 2;
+            transition: opacity 0.5s;
+        }
+
+        .secret-message {
+            position: absolute; /* Stacked behind */
+            z-index: 1;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.5s ease;
+            width: 100%;
+        }
+
+        .balloon {
+            aspect-ratio: 1; background: radial-gradient(circle at 30% 30%, #ffd1dc, #ff8fa3);
+            border-radius: 50%; cursor: pointer; display: flex; justify-content: center;
+            align-items: center; font-size: 1.5rem; user-select: none;
+            box-shadow: inset -5px -5px 10px rgba(0,0,0,0.1);
+            animation: floatBalloon 3s ease-in-out infinite;
+        }
+        .balloon:nth-child(2n) { animation-delay: 1s; }
+        .balloon.popped { transform: scale(1.2); opacity: 0; pointer-events: none; transition: 0.2s; }
+
+        /* --- Video --- */
+        .video-box {
+            width: 100%; border-radius: 20px; overflow: hidden; background: #000;
+            position: relative; padding-bottom: 177.77%; height: 0;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .video-box video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+
+        /* --- Quiz --- */
+        .option {
+            background: white; border: 2px solid #ffd1dc; padding: 15px;
+            border-radius: 15px; margin-bottom: 10px; cursor: pointer; transition: 0.2s;
+            font-weight: 700; color: #555;
+        }
+        .option.correct { background: var(--pink-pop); color: white; border-color: var(--pink-deep); }
+
+        /* --- Profile & Zootopia Theme --- */
+        .profile-pic {
+            width: 130px; height: 130px; border-radius: 50%; object-fit: cover;
+            border: 5px solid white; box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            margin: 0 auto 15px; display: block;
+        }
+        .srk-quote {
+            font-style: italic; color: #999; font-size: 0.85rem; margin-top: 20px;
+            border-top: 1px solid #eee; padding-top: 10px;
+        }
+
+        @keyframes floatBalloon { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+    </style>
+</head>
+<body>
+
+    <div class="hearts-bg" id="hearts-bg"></div>
+
+    <div class="container">
+
+        <div class="screen active" id="s1">
+            <h1>Hey Birthday Girl! ✨</h1>
+            <div class="card">
+                <p>I built a little corner of the internet just for you.</p>
+                <p style="font-size: 0.9rem; font-weight: 400;">(Don't judge my coding skills, judge the effort 😉)</p>
+                <button class="btn" onclick="next(2)">Enter Here ➡️</button>
+            </div>
+        </div>
+
+        <div class="screen" id="s2">
+            <h1>Pop to Reveal! 🎈</h1>
+            <p>Something is hiding behind these...</p>
+            
+            <div class="card">
+                <div class="game-area">
+                    <div class="balloon-grid" id="balloon-grid">
+                        <div class="balloon" onclick="pop(this)">🎀</div>
+                        <div class="balloon" onclick="pop(this)">🎬</div>
+                        <div class="balloon" onclick="pop(this)">✨</div>
+                        <div class="balloon" onclick="pop(this)">🍭</div>
+                        <div class="balloon" onclick="pop(this)">🍰</div>
+                        <div class="balloon" onclick="pop(this)">🐰</div>
+                    </div>
+
+                    <div class="secret-message" id="secret-message">
+                        <h2 style="color: var(--pink-deep); margin-bottom: 10px;">Found it! 🎯</h2>
+                        <p>You’ve successfully unlocked the path to my... next screen. (What did you think I was gonna say? 😉)</p>
+                        <button class="btn" onclick="next(3)">Move On 🎬</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="screen" id="s3">
+            <h1 style="font-size: 2.2rem;">Main Character Energy 🎥</h1>
+            <div class="card" style="padding:15px;">
+                <div class="video-box">
+                    <video controls playsinline>
+                        <source src="birthday_video.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <button class="btn" style="width:100%; margin-top:15px;" onclick="next(4)">One Last Thing 📝</button>
+            </div>
+        </div>
+
+        <div class="screen" id="s4">
+            <h1>Vibe Check 🧐</h1>
+            <div class="card">
+                <p>What's the agenda for today?</p>
+                <div class="option" onclick="check(this)">1. Look like a WOW 💅</div>
+                <div class="option" onclick="check(this)">2. Eat everything 🍕</div>
+                <div class="option" onclick="check(this)">3. Being the cutest 🐰</div>
+                
+                <div id="quiz-btn" style="display:none; margin-top:15px;">
+                    <p style="font-size:0.9rem;">Correct Answer: <b>All of them!</b></p>
+                    <button class="btn" onclick="next(5)">Final Surprise ❤️</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="screen" id="s5">
+            <h1>Happy Birthday! 🎂</h1>
+            <div class="card">
+                <img src="https://via.placeholder.com/150" class="profile-pic" alt="Trudy's Pic">
+                
+                <h3 style="color: var(--pink-deep); font-family: 'Pacifico';">To my Trudy 🐰</h3>
+                <p style="font-size: 1rem; margin-top: 15px;">
+                    Happy Birthday to the Judy Hopps of my life. You might be a "dumb bunny" sometimes, but you're my favorite bunny.
+                    <br><br>
+                    Stay iconic, stay dramatic, and keep smiling.
+                </p>
+                
+                <div class="srk-quote">
+                    "Tujhe dekha to yeh jaana sanam... ki Birthday hai aaj!" (SRK style) ✨
+                </div>
+
+                <button class="btn" onclick="celebrate()">Make a Wish ✨</button>
+            </div>
+        </div>
+
+    </div>
+
+<script>
+    // --- Navigation ---
+    function next(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('s' + id).classList.add('active');
+        if(id === 5) confettiEffect();
+    }
+
+    // --- Logic: Pop & Reveal ---
+    let popped = 0;
+    function pop(el) {
+        if(el.classList.contains('popped')) return;
+        
+        el.classList.add('popped');
+        popped++;
+        
+        // Haptic
+        if(navigator.vibrate) navigator.vibrate(40);
+        
+        // Confetti at balloon
+        let rect = el.getBoundingClientRect();
+        confetti({
+            particleCount: 20, spread: 40, 
+            origin: { x: (rect.left+25)/window.innerWidth, y: (rect.top+25)/window.innerHeight },
+            colors: ['#ff8fa3', '#fff']
+        });
+
+        // REVEAL LOGIC
+        if(popped === 6) {
+            setTimeout(() => {
+                const grid = document.getElementById('balloon-grid');
+                const msg = document.getElementById('secret-message');
+                
+                // Hide grid
+                grid.style.opacity = '0';
+                grid.style.pointerEvents = 'none';
+                
+                // Show message
+                msg.style.opacity = '1';
+                msg.style.transform = 'scale(1)';
+                msg.style.zIndex = '10'; // Bring to front
+            }, 300);
+        }
+    }
+
+    // --- Quiz Logic ---
+    function check(el) {
+        // Highlight logic
+        document.querySelectorAll('.option').forEach(o => o.classList.remove('correct'));
+        el.classList.add('correct');
+        el.innerText += " ✅";
+        
+        confetti({ particleCount: 30, spread: 50, origin: { y: 0.7 } });
+        
+        setTimeout(() => { 
+            document.getElementById('quiz-btn').style.display = 'block'; 
+        }, 300);
+    }
+
+    // --- Celebration ---
+    function celebrate() {
+        alert("Happy Birthday Trudy! 🐰🥕");
+        confettiEffect();
+    }
+
+    function confettiEffect() {
+        let end = Date.now() + 3000;
+        let colors = ['#ff4d6d', '#ffd1dc', '#ffffff'];
+        (function frame() {
+            confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 }, colors: colors });
+            confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 }, colors: colors });
+            if (Date.now() < end) requestAnimationFrame(frame);
+        }());
+    }
+
+    // --- Floating Hearts Background ---
+    function createHeart() {
+        const heart = document.createElement('div');
+        // Mix of Hearts and maybe a carrot/bunny for Zootopia easter egg sometimes
+        const icons = ['❤️', '❤️', '✨', '🌸']; 
+        heart.innerHTML = icons[Math.floor(Math.random() * icons.length)];
+        
+        heart.style.position = 'fixed';
+        heart.style.left = Math.random() * 100 + 'vw';
+        heart.style.top = '100vh';
+        heart.style.fontSize = (Math.random() * 20 + 15) + 'px';
+        heart.style.opacity = Math.random() * 0.5 + 0.3; 
+        heart.style.transition = 'top 5s linear, opacity 5s ease';
+        heart.style.zIndex = '-1';
+        
+        document.getElementById('hearts-bg').appendChild(heart);
+
+        setTimeout(() => {
+            heart.style.top = '-50px';
+            heart.style.opacity = '0';
+        }, 100);
+
+        setTimeout(() => { heart.remove(); }, 5000);
+    }
+
+    setInterval(createHeart, 400);
+
+</script>
+</body>
+</html>
