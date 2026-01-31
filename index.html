@@ -2,11 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>For Trudy 🐰</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Chewy&family=Russo+One&family=Varela+Round&display=swap" rel="stylesheet">
-    
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     
     <style>
@@ -15,13 +14,19 @@
             --pink-pop: #ff8fa3;
             --pink-deep: #ff4d6d;
             --gaming-dark: #050510;
-            --gaming-accent: #00f3ff; /* Cyan Neon */
-            --gaming-accent-2: #bc13fe; /* Purple Neon */
+            --gaming-accent: #00f3ff;
+            --gaming-accent-2: #bc13fe;
             --glass: rgba(255, 255, 255, 0.9);
             --shadow: 0 10px 40px rgba(255, 77, 109, 0.25);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
 
         body {
             font-family: 'Varela Round', sans-serif;
@@ -29,8 +34,6 @@
             background-size: 400% 400%;
             animation: gradientBG 15s ease infinite;
             color: #555;
-            height: 100vh;
-            overflow: hidden;
             text-align: center;
         }
 
@@ -40,55 +43,69 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* --- Global Layers --- */
+        /* --- Background Layers --- */
         .bg-layer {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; overflow: hidden;
+            pointer-events: none; z-index: 0;
         }
-        #hearts-bg { z-index: 0; }
-        #sparkles-bg { z-index: 0; }
 
-        /* --- Layout --- */
+        /* --- Main Layout Engine --- */
         .container {
-            width: 100%; height: 100vh; position: relative;
-            display: flex; justify-content: center; align-items: center; z-index: 1;
+            width: 100%;
+            height: 100%;
+            position: relative;
+            z-index: 1;
         }
 
         .screen {
-            position: absolute; width: 100%; height: 100%;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            padding: 25px; opacity: 0; pointer-events: none;
-            transition: all 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-            transform: scale(0.9) translateY(30px);
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto; 
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.6s ease;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
-        .screen.active { opacity: 1; pointer-events: all; transform: scale(1) translateY(0); }
+
+        .screen.active {
+            opacity: 1;
+            pointer-events: all;
+            z-index: 10;
+        }
+
+        .content-wrapper {
+            margin: auto;
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: min-content;
+        }
 
         /* ============================
            SCREEN 1: GAMING THEME
            ============================ */
-        #s1 {
-            background-color: var(--gaming-dark);
-            z-index: 100;
-            overflow: hidden;
-        }
+        #s1 { background-color: var(--gaming-dark); }
 
-        /* Moving Grid Animation */
         .gaming-grid {
-            position: absolute;
-            width: 200%;
-            height: 200%;
-            bottom: -50%;
-            left: -50%;
+            position: fixed;
+            width: 200%; height: 200%; bottom: -50%; left: -50%;
             background-image: 
                 linear-gradient(var(--gaming-accent-2) 1px, transparent 1px), 
                 linear-gradient(90deg, var(--gaming-accent-2) 1px, transparent 1px);
             background-size: 50px 50px;
-            background-position: center;
             transform: perspective(500px) rotateX(60deg);
             animation: moveGrid 5s linear infinite;
-            opacity: 0.3;
-            z-index: -1;
-            box-shadow: 0 0 100px rgba(188, 19, 254, 0.5);
+            opacity: 0.3; z-index: -1;
+            pointer-events: none;
         }
 
         @keyframes moveGrid {
@@ -98,10 +115,8 @@
 
         #s1 h1 {
             font-family: 'Russo One', sans-serif;
-            font-size: 3.5rem;
-            color: white;
-            text-transform: uppercase;
-            letter-spacing: 3px;
+            font-size: clamp(2rem, 5vw, 4rem);
+            color: white; text-transform: uppercase; letter-spacing: 3px;
             text-shadow: 0 0 15px var(--gaming-accent);
             margin-bottom: 20px;
         }
@@ -110,78 +125,50 @@
             background: rgba(0, 0, 0, 0.8);
             border: 2px solid var(--gaming-accent);
             box-shadow: 0 0 30px rgba(0, 243, 255, 0.2);
-            border-radius: 8px; /* Boxy for gaming */
+            border-radius: 8px;
         }
 
-        #s1 p {
-            color: #ccc;
-            font-family: 'Russo One', sans-serif; /* Keep font consistent on page 1 */
-            font-weight: 400;
-            letter-spacing: 1px;
-            font-size: 0.9rem;
-        }
-
-        #s1 .highlight {
-            color: var(--gaming-accent);
-            text-shadow: 0 0 5px var(--gaming-accent);
-        }
-
-        #s1 hr { border-color: var(--gaming-accent-2); opacity: 0.5; }
-
+        #s1 p { color: #ccc; font-family: 'Russo One', sans-serif; font-size: 0.9rem; }
+        #s1 .highlight { color: var(--gaming-accent); text-shadow: 0 0 5px var(--gaming-accent); }
+        #s1 hr { border-color: var(--gaming-accent-2); opacity: 0.5; margin: 15px 0; }
+        
         #s1 .btn {
-            background: transparent;
-            border: 2px solid var(--gaming-accent);
-            color: var(--gaming-accent);
-            font-family: 'Russo One', sans-serif;
-            text-transform: uppercase;
-            box-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
-            border-radius: 5px;
-            animation: none;
-        }
-        #s1 .btn:active {
-            background: var(--gaming-accent);
-            color: black;
+            background: transparent; border: 2px solid var(--gaming-accent);
+            color: var(--gaming-accent); font-family: 'Russo One', sans-serif;
+            text-transform: uppercase; box-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+            border-radius: 5px; animation: none;
         }
 
         /* ============================
-           CUTE THEME (PAGES 2-5)
+           CUTE THEME
            ============================ */
         h1 {
-            font-family: 'Chewy', cursive; /* Fun Bubbly Font */
-            font-size: 3.2rem;
-            color: var(--pink-deep); margin-bottom: 15px;
+            font-family: 'Chewy', cursive;
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            color: var(--pink-deep); margin-bottom: 20px;
             text-shadow: 3px 3px 0px rgba(255,255,255,0.8);
             line-height: 1.2;
-            letter-spacing: 1px;
         }
 
         .card {
             background: var(--glass); backdrop-filter: blur(20px);
-            border-radius: 30px; padding: 30px; width: 100%; max-width: 360px;
+            border-radius: 30px; padding: 30px; 
+            width: 100%; max-width: 450px; 
             box-shadow: var(--shadow); border: 4px solid #fff;
             position: relative;
-            transition: transform 0.3s;
         }
 
-        p { font-size: 1.15rem; line-height: 1.6; margin-bottom: 20px; font-weight: 600; color: #666; }
+        p { font-size: 1.1rem; line-height: 1.5; margin-bottom: 20px; font-weight: 600; color: #666; }
 
         .btn {
             background: linear-gradient(45deg, var(--pink-pop), var(--pink-deep));
-            color: white; border: none; padding: 15px 45px; border-radius: 50px;
-            font-size: 1.3rem; font-family: 'Chewy', cursive; letter-spacing: 1px;
+            color: white; border: none; padding: 15px 35px; border-radius: 50px;
+            font-size: 1.2rem; font-family: 'Chewy', cursive; letter-spacing: 1px;
             cursor: pointer; box-shadow: 0 8px 20px rgba(255, 77, 109, 0.4);
-            transition: transform 0.2s; margin-top: 10px;
-            animation: pulseBtn 2s infinite;
+            margin-top: 15px; width: 100%; transition: transform 0.2s;
         }
         .btn:active { transform: scale(0.95); }
 
-        @keyframes pulseBtn {
-            0% { box-shadow: 0 0 0 0 rgba(255, 77, 109, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(255, 77, 109, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 77, 109, 0); }
-        }
-
-        /* --- Typewriter --- */
         .typewriter p {
             overflow: hidden; white-space: nowrap; margin: 0 auto;
             animation: typing 3.5s steps(40, end);
@@ -192,55 +179,75 @@
             position: relative; width: 100%; min-height: 300px;
             display: flex; justify-content: center; align-items: center;
         }
-
         .balloon-grid {
             display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;
-            width: 100%; max-width: 300px; position: absolute; z-index: 2;
-            transition: opacity 0.5s;
+            width: 100%; max-width: 300px; position: absolute; z-index: 2; transition: opacity 0.5s;
         }
-
         .secret-message {
             position: absolute; z-index: 1; opacity: 0; transform: scale(0.8);
             transition: all 0.5s ease; width: 100%;
         }
-
         .balloon {
             aspect-ratio: 1; background: radial-gradient(circle at 30% 30%, #ffd1dc, #ff8fa3);
             border-radius: 50%; cursor: pointer; display: flex; justify-content: center;
-            align-items: center; font-size: 1.5rem; user-select: none;
-            box-shadow: inset -5px -5px 10px rgba(0,0,0,0.1);
+            align-items: center; font-size: 1.8rem; user-select: none;
             animation: floatBalloon 3s ease-in-out infinite;
         }
-        .balloon:nth-child(2n) { animation-delay: 1s; }
-        .balloon.popped { transform: scale(1.2); opacity: 0; pointer-events: none; transition: 0.2s; }
+        .balloon.popped { transform: scale(1.2); opacity: 0; pointer-events: none; }
 
-        /* --- Video & Quiz --- */
-        .video-box {
-            width: 100%; border-radius: 20px; overflow: hidden; background: #000;
-            position: relative; padding-bottom: 177.77%; height: 0;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        /* --- VIDEO OPTIMIZATION (THE FIX) --- */
+        .video-container {
+            width: 100%;
+            max-width: 320px; /* Perfect width for mobile reels */
+            margin: 0 auto;
+            position: relative;
+            /* Smart Height: Tries to be 140% tall (Reel), but capped at 50% of screen height */
+            padding-bottom: min(140%, 50vh); 
+            height: 0;
+            overflow: hidden;
+            border-radius: 20px;
+            background: #000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border: 4px solid #fff;
         }
-        .video-box video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
 
+        .video-container video {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            object-fit: cover; /* Ensures Reel fills space */
+        }
+
+        /* --- Quiz & Profile --- */
         .option {
-            background: white; border: 2px solid #ffd1dc; padding: 15px;
-            border-radius: 15px; margin-bottom: 10px; cursor: pointer; transition: 0.2s;
-            font-weight: 700; color: #555;
+            background: white; border: 2px solid #ffd1dc; padding: 12px;
+            border-radius: 15px; margin-bottom: 8px; cursor: pointer;
+            font-weight: 700; color: #555; text-align: left; transition: 0.2s;
         }
+        .option:hover { background: #fff0f3; }
         .option.correct { background: var(--pink-pop); color: white; border-color: var(--pink-deep); }
 
-        /* --- Profile & Footer --- */
         .profile-pic {
             width: 130px; height: 130px; border-radius: 50%; object-fit: cover;
             border: 5px solid white; box-shadow: 0 8px 20px rgba(0,0,0,0.1);
             margin: 0 auto 15px; display: block;
         }
         .srk-quote {
-            font-style: italic; color: #999; font-size: 0.85rem; margin-top: 20px;
+            font-style: italic; color: #999; font-size: 0.85rem; margin-top: 15px;
             border-top: 1px solid #eee; padding-top: 10px;
         }
 
         @keyframes floatBalloon { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        
+        /* Landscape Mode Mobile Tweaks */
+        @media (max-height: 500px) {
+            .content-wrapper { padding: 10px; }
+            h1 { font-size: 2rem; margin-bottom: 5px; }
+            .card { padding: 15px; }
+            .profile-pic { width: 80px; height: 80px; }
+            .game-area { min-height: 200px; }
+            .balloon-grid { width: 200px; }
+        }
     </style>
 </head>
 <body>
@@ -252,111 +259,113 @@
 
         <div class="screen active" id="s1">
             <div class="gaming-grid"></div>
-            
-            <h1>Player Ready? 🎮</h1>
-            <div class="card typewriter">
-                <p>TARGET: SWATI (AKA TRUDY)</p>
-                <p class="highlight" style="margin-top:5px;">MISSION: BIRTHDAY PROTOCOL</p>
-                <hr>
-                <p style="white-space: normal; font-size: 0.85rem; font-family: 'Varela Round', sans-serif; color: #ddd;">
-                    ⚠️ Warning: Entering High Cuteness Zone.
-                </p>
-                <button class="btn" onclick="next(2)">START GAME 🚀</button>
+            <div class="content-wrapper">
+                <h1>Player Ready? 🎮</h1>
+                <div class="card typewriter">
+                    <p>TARGET: SWATI (AKA TRUDY)</p>
+                    <p class="highlight" style="margin-top:5px;">MISSION: BIRTHDAY PROTOCOL</p>
+                    <hr>
+                    <p style="white-space: normal; font-size: 0.85rem; font-family: 'Varela Round', sans-serif; color: #ddd;">
+                        ⚠️ Warning: Entering High Cuteness Zone.
+                    </p>
+                    <button class="btn" onclick="next(2)">START GAME 🚀</button>
+                </div>
             </div>
         </div>
 
         <div class="screen" id="s2">
-            <h1>Pop to Reveal! 🎈</h1>
-            <p>Something is hiding behind these...</p>
-            
-            <div class="card">
-                <div class="game-area">
-                    <div class="balloon-grid" id="balloon-grid">
-                        <div class="balloon" onclick="pop(this)">🎀</div>
-                        <div class="balloon" onclick="pop(this)">🎬</div>
-                        <div class="balloon" onclick="pop(this)">✨</div>
-                        <div class="balloon" onclick="pop(this)">🍭</div>
-                        <div class="balloon" onclick="pop(this)">🍰</div>
-                        <div class="balloon" onclick="pop(this)">🐰</div>
-                    </div>
-
-                    <div class="secret-message" id="secret-message">
-                        <h2 style="color: var(--pink-deep); margin-bottom: 10px; font-family: 'Chewy', cursive;">Found it! 🎯</h2>
-                        <p>You’ve unlocked the path to the next level. (Good job, SWTU ! 😉)</p>
-                        <button class="btn" onclick="next(3)">Moveing On</button>
+            <div class="content-wrapper">
+                <h1>Pop to Reveal! 🎈</h1>
+                <p>Something is hiding behind these...</p>
+                <div class="card">
+                    <div class="game-area">
+                        <div class="balloon-grid" id="balloon-grid">
+                            <div class="balloon" onclick="pop(this)">🎀</div>
+                            <div class="balloon" onclick="pop(this)">🎬</div>
+                            <div class="balloon" onclick="pop(this)">✨</div>
+                            <div class="balloon" onclick="pop(this)">🍭</div>
+                            <div class="balloon" onclick="pop(this)">🍰</div>
+                            <div class="balloon" onclick="pop(this)">🐰</div>
+                        </div>
+                        <div class="secret-message" id="secret-message">
+                            <h2 style="color: var(--pink-deep); margin-bottom: 10px; font-family: 'Chewy', cursive;">Found it! 🎯</h2>
+                            <p>You’ve unlocked the path to the next level. (Good job, SWTU! 😉)</p>
+                            <button class="btn" onclick="next(3)">Move On 🎬</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="screen" id="s3">
-            <h1 style="font-size: 2.5rem;">Main Character Vibes ✨</h1>
-            <div class="card" style="padding:15px;">
-                <div class="video-box">
-                    <video controls playsinline>
-                        <source src="birthday_video.mp4" type="video/mp4">
-                    </video>
+            <div class="content-wrapper">
+                <h1>Main Character Vibes ✨</h1>
+                <div class="card">
+                    <div class="video-container">
+                        <video controls playsinline>
+                            <source src="birthday_video.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                    <button class="btn" onclick="next(4)">Aage Chale Ma'am? 💃</button>
                 </div>
-                <button class="btn" style="width:100%; margin-top:15px;" onclick="next(4)">Aage Chale Ma'am? 💃</button>
             </div>
         </div>
 
         <div class="screen" id="s4">
-            <h1>Vibe Check 🧐</h1>
-            <div class="card">
-                <p>What's the agenda for today?</p>
-                <div class="option" onclick="check(this)">1. Look like a WOW 💅</div>
-                <div class="option" onclick="check(this)">2. Eat everything 🍕</div>
-                <div class="option" onclick="check(this)">3. Being the cutest 🐰</div>
-                
-                <div id="quiz-btn" style="display:none; margin-top:15px;">
-                    <p style="font-size:0.9rem;">Correct Answer: <b>All of them!</b></p>
-                    <button class="btn" onclick="next(5)">Final Surprise ❤️</button>
+            <div class="content-wrapper">
+                <h1>Vibe Check 🧐</h1>
+                <div class="card">
+                    <p>What's the agenda for today?</p>
+                    <div class="option" onclick="check(this)">1. Look like a WOW 💅</div>
+                    <div class="option" onclick="check(this)">2. Eat everything 🍕</div>
+                    <div class="option" onclick="check(this)">3. Being the cutest 🐰</div>
+                    
+                    <div id="quiz-btn" style="display:none; margin-top:15px;">
+                        <p style="font-size:0.9rem;">Correct Answer: <b>All of them!</b></p>
+                        <button class="btn" onclick="next(5)">Final Surprise ❤️</button>
+                    </div>
                 </div>
             </div>
         </div>
 
         <div class="screen" id="s5">
-            <h1>Happy Birthday! 🎂</h1>
-            <div class="card">
-                <img src="https://via.placeholder.com/150" class="profile-pic" alt="Trudy's Pic">
-                
-                <h3 style="color: var(--pink-deep); font-family: 'Chewy', cursive;">To Trudy Cabbagepatch 🐰</h3>
-                <p style="font-size: 1rem; margin-top: 15px;">
-                    Happiest Birthday to <b>
-  </b><b>Swati Swostisudha Biswal</b>.
-                    <br>You might be a "dumb bunny" sometimes 😁, but a cute little fun bunny.From slaying outfits to , you make everything look fun.
-Never stop exploring, trying new things,
-                    <br><br>
-                    Stay iconic, stay dramatic, and please... thoda khana peena time pe kiya karo! 🥕
-                </p>
-                
-                <div class="srk-quote">
-                    "Tujhe dekha to yeh jaana sanam... ki Birthday hai aaj!" (SRK style) ✨
-                </div>
+            <div class="content-wrapper">
+                <h1>Happy Birthday! 🎂</h1>
+                <div class="card">
+                    <img src="https://via.placeholder.com/150" class="profile-pic" alt="Trudy's Pic">
+                    
+                    <h3 style="color: var(--pink-deep); font-family: 'Chewy', cursive;">To Trudy Cabbagepatch 🐰</h3>
+                    <p style="font-size: 1rem; margin-top: 10px;">
+                        Happiest Birthday to <b>Swati Swostisudha Biswal</b>.
+                        <br>You might be a "dumb bunny" sometimes 😁, but a cute little fun bunny. From slaying outfits to just being you, you make everything look fun.
+                        <br><br>
+                        Stay iconic, stay dramatic, and please... thoda khana peena time pe kiya karo! 🥕
+                    </p>
+                    
+                    <div class="srk-quote">
+                        "Tujhe dekha to yeh jaana sanam... ki Birthday hai aaj!" (SRK style) ✨
+                    </div>
 
-                <button class="btn" onclick="celebrate()">Make a Wish ✨</button>
+                    <button class="btn" onclick="celebrate()">Make a Wish ✨</button>
+                </div>
             </div>
         </div>
 
     </div>
 
 <script>
-    // --- Navigation ---
     function next(id) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById('s' + id).classList.add('active');
         if(id === 5) confettiEffect();
     }
 
-    // --- Logic: Pop & Reveal ---
     let popped = 0;
     function pop(el) {
         if(el.classList.contains('popped')) return;
-        
         el.classList.add('popped');
         popped++;
-        
         if(navigator.vibrate) navigator.vibrate(40);
         
         let rect = el.getBoundingClientRect();
@@ -368,10 +377,9 @@ Never stop exploring, trying new things,
 
         if(popped === 6) {
             setTimeout(() => {
-                const grid = document.getElementById('balloon-grid');
-                const msg = document.getElementById('secret-message');
-                grid.style.opacity = '0';
-                grid.style.pointerEvents = 'none';
+                document.getElementById('balloon-grid').style.opacity = '0';
+                document.getElementById('balloon-grid').style.pointerEvents = 'none';
+                let msg = document.getElementById('secret-message');
                 msg.style.opacity = '1';
                 msg.style.transform = 'scale(1)';
                 msg.style.zIndex = '10';
@@ -379,7 +387,6 @@ Never stop exploring, trying new things,
         }
     }
 
-    // --- Quiz Logic ---
     function check(el) {
         document.querySelectorAll('.option').forEach(o => o.classList.remove('correct'));
         el.classList.add('correct');
@@ -388,7 +395,6 @@ Never stop exploring, trying new things,
         setTimeout(() => { document.getElementById('quiz-btn').style.display = 'block'; }, 300);
     }
 
-    // --- Celebration ---
     function celebrate() {
         alert("Wishes Sent! 🐰🥕");
         confettiEffect();
@@ -404,7 +410,7 @@ Never stop exploring, trying new things,
         }());
     }
 
-    // --- Background Layer 1: Floating Hearts ---
+    // Background Layers
     function createHeart() {
         const heart = document.createElement('div');
         const icons = ['❤️', '✨', '🌸', '🐰']; 
@@ -415,22 +421,18 @@ Never stop exploring, trying new things,
         heart.style.fontSize = (Math.random() * 20 + 10) + 'px';
         heart.style.opacity = Math.random() * 0.5 + 0.3; 
         heart.style.transition = 'top 6s linear, opacity 6s ease';
-        
         document.getElementById('hearts-bg').appendChild(heart);
-
         setTimeout(() => { heart.style.top = '-50px'; heart.style.opacity = '0'; }, 100);
         setTimeout(() => { heart.remove(); }, 6000);
     }
-    // Faster creation for fuller background
     setInterval(createHeart, 300);
 
-    // --- Background Layer 2: Twinkling Sparkles ---
     function createSparkle() {
         const sparkle = document.createElement('div');
         sparkle.innerHTML = '.';
         sparkle.style.position = 'fixed';
         sparkle.style.left = Math.random() * 100 + 'vw';
-        sparkle.style.top = Math.random() * 100 + 'vh'; // Random spot on screen
+        sparkle.style.top = Math.random() * 100 + 'vh';
         sparkle.style.width = (Math.random() * 5 + 2) + 'px';
         sparkle.style.height = sparkle.style.width;
         sparkle.style.background = 'white';
@@ -438,16 +440,12 @@ Never stop exploring, trying new things,
         sparkle.style.boxShadow = '0 0 5px white';
         sparkle.style.opacity = '0';
         sparkle.style.transition = 'opacity 1s ease-in-out';
-        
         document.getElementById('sparkles-bg').appendChild(sparkle);
-
-        // Fade in then out
         setTimeout(() => { sparkle.style.opacity = Math.random() * 0.7 + 0.3; }, 100);
         setTimeout(() => { sparkle.style.opacity = '0'; }, 1500);
         setTimeout(() => { sparkle.remove(); }, 2500);
     }
     setInterval(createSparkle, 200);
-
 </script>
 </body>
 </html>
