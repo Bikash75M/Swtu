@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>For Trudy 🐰</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Chewy&family=Russo+One&family=Varela+Round&display=swap" rel="stylesheet">
     
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     
@@ -14,27 +14,39 @@
             --pink-light: #ffe6ea;
             --pink-pop: #ff8fa3;
             --pink-deep: #ff4d6d;
-            --glass: rgba(255, 255, 255, 0.95); /* Slightly more opaque for better reading */
-            --shadow: 0 10px 40px rgba(255, 77, 109, 0.2);
+            --gaming-dark: #050510;
+            --gaming-accent: #00f3ff; /* Cyan Neon */
+            --gaming-accent-2: #bc13fe; /* Purple Neon */
+            --glass: rgba(255, 255, 255, 0.9);
+            --shadow: 0 10px 40px rgba(255, 77, 109, 0.25);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
-            font-family: 'Nunito', sans-serif;
-            /* Restored the soft pink gradient you liked */
-            background: linear-gradient(180deg, var(--pink-light) 0%, #fff 100%);
+            font-family: 'Varela Round', sans-serif;
+            background: linear-gradient(-45deg, #ffe6ea, #fff0f3, #e3f2fd, #fff);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
             color: #555;
             height: 100vh;
             overflow: hidden;
             text-align: center;
         }
 
-        /* --- Background Floating Hearts --- */
-        .hearts-bg {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; z-index: 0; overflow: hidden;
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
+
+        /* --- Global Layers --- */
+        .bg-layer {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; overflow: hidden;
+        }
+        #hearts-bg { z-index: 0; }
+        #sparkles-bg { z-index: 0; }
 
         /* --- Layout --- */
         .container {
@@ -42,7 +54,6 @@
             display: flex; justify-content: center; align-items: center; z-index: 1;
         }
 
-        /* --- Screens --- */
         .screen {
             position: absolute; width: 100%; height: 100%;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
@@ -52,57 +63,145 @@
         }
         .screen.active { opacity: 1; pointer-events: all; transform: scale(1) translateY(0); }
 
-        /* --- Aesthetic Components --- */
+        /* ============================
+           SCREEN 1: GAMING THEME
+           ============================ */
+        #s1 {
+            background-color: var(--gaming-dark);
+            z-index: 100;
+            overflow: hidden;
+        }
+
+        /* Moving Grid Animation */
+        .gaming-grid {
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            bottom: -50%;
+            left: -50%;
+            background-image: 
+                linear-gradient(var(--gaming-accent-2) 1px, transparent 1px), 
+                linear-gradient(90deg, var(--gaming-accent-2) 1px, transparent 1px);
+            background-size: 50px 50px;
+            background-position: center;
+            transform: perspective(500px) rotateX(60deg);
+            animation: moveGrid 5s linear infinite;
+            opacity: 0.3;
+            z-index: -1;
+            box-shadow: 0 0 100px rgba(188, 19, 254, 0.5);
+        }
+
+        @keyframes moveGrid {
+            0% { transform: perspective(500px) rotateX(60deg) translateY(0); }
+            100% { transform: perspective(500px) rotateX(60deg) translateY(50px); }
+        }
+
+        #s1 h1 {
+            font-family: 'Russo One', sans-serif;
+            font-size: 3.5rem;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 0 0 15px var(--gaming-accent);
+            margin-bottom: 20px;
+        }
+
+        #s1 .card {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid var(--gaming-accent);
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.2);
+            border-radius: 8px; /* Boxy for gaming */
+        }
+
+        #s1 p {
+            color: #ccc;
+            font-family: 'Russo One', sans-serif; /* Keep font consistent on page 1 */
+            font-weight: 400;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+        }
+
+        #s1 .highlight {
+            color: var(--gaming-accent);
+            text-shadow: 0 0 5px var(--gaming-accent);
+        }
+
+        #s1 hr { border-color: var(--gaming-accent-2); opacity: 0.5; }
+
+        #s1 .btn {
+            background: transparent;
+            border: 2px solid var(--gaming-accent);
+            color: var(--gaming-accent);
+            font-family: 'Russo One', sans-serif;
+            text-transform: uppercase;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+            border-radius: 5px;
+            animation: none;
+        }
+        #s1 .btn:active {
+            background: var(--gaming-accent);
+            color: black;
+        }
+
+        /* ============================
+           CUTE THEME (PAGES 2-5)
+           ============================ */
         h1 {
-            font-family: 'Pacifico', cursive; font-size: 2.8rem;
+            font-family: 'Chewy', cursive; /* Fun Bubbly Font */
+            font-size: 3.2rem;
             color: var(--pink-deep); margin-bottom: 15px;
-            text-shadow: 2px 2px 0px rgba(255,255,255,0.6);
+            text-shadow: 3px 3px 0px rgba(255,255,255,0.8);
             line-height: 1.2;
+            letter-spacing: 1px;
         }
 
         .card {
             background: var(--glass); backdrop-filter: blur(20px);
             border-radius: 30px; padding: 30px; width: 100%; max-width: 360px;
-            box-shadow: var(--shadow); border: 2px solid #fff;
+            box-shadow: var(--shadow); border: 4px solid #fff;
             position: relative;
+            transition: transform 0.3s;
         }
 
-        p { font-size: 1.1rem; line-height: 1.6; margin-bottom: 20px; font-weight: 600; color: #666; }
+        p { font-size: 1.15rem; line-height: 1.6; margin-bottom: 20px; font-weight: 600; color: #666; }
 
         .btn {
             background: linear-gradient(45deg, var(--pink-pop), var(--pink-deep));
-            color: white; border: none; padding: 15px 40px; border-radius: 50px;
-            font-size: 1.1rem; font-family: 'Nunito', sans-serif; font-weight: 700;
-            cursor: pointer; box-shadow: 0 5px 15px rgba(255, 77, 109, 0.3);
+            color: white; border: none; padding: 15px 45px; border-radius: 50px;
+            font-size: 1.3rem; font-family: 'Chewy', cursive; letter-spacing: 1px;
+            cursor: pointer; box-shadow: 0 8px 20px rgba(255, 77, 109, 0.4);
             transition: transform 0.2s; margin-top: 10px;
+            animation: pulseBtn 2s infinite;
         }
         .btn:active { transform: scale(0.95); }
 
-        /* --- The Reveal Mechanic --- */
+        @keyframes pulseBtn {
+            0% { box-shadow: 0 0 0 0 rgba(255, 77, 109, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 77, 109, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 77, 109, 0); }
+        }
+
+        /* --- Typewriter --- */
+        .typewriter p {
+            overflow: hidden; white-space: nowrap; margin: 0 auto;
+            animation: typing 3.5s steps(40, end);
+        }
+
+        /* --- Balloon Game --- */
         .game-area {
-            position: relative;
-            width: 100%;
-            min-height: 300px; /* Ensures space for balloons and message */
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            position: relative; width: 100%; min-height: 300px;
+            display: flex; justify-content: center; align-items: center;
         }
 
         .balloon-grid {
             display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;
-            width: 100%; max-width: 300px;
-            position: absolute; /* Stacked on top */
-            z-index: 2;
+            width: 100%; max-width: 300px; position: absolute; z-index: 2;
             transition: opacity 0.5s;
         }
 
         .secret-message {
-            position: absolute; /* Stacked behind */
-            z-index: 1;
-            opacity: 0;
-            transform: scale(0.8);
-            transition: all 0.5s ease;
-            width: 100%;
+            position: absolute; z-index: 1; opacity: 0; transform: scale(0.8);
+            transition: all 0.5s ease; width: 100%;
         }
 
         .balloon {
@@ -115,7 +214,7 @@
         .balloon:nth-child(2n) { animation-delay: 1s; }
         .balloon.popped { transform: scale(1.2); opacity: 0; pointer-events: none; transition: 0.2s; }
 
-        /* --- Video --- */
+        /* --- Video & Quiz --- */
         .video-box {
             width: 100%; border-radius: 20px; overflow: hidden; background: #000;
             position: relative; padding-bottom: 177.77%; height: 0;
@@ -123,7 +222,6 @@
         }
         .video-box video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
 
-        /* --- Quiz --- */
         .option {
             background: white; border: 2px solid #ffd1dc; padding: 15px;
             border-radius: 15px; margin-bottom: 10px; cursor: pointer; transition: 0.2s;
@@ -131,7 +229,7 @@
         }
         .option.correct { background: var(--pink-pop); color: white; border-color: var(--pink-deep); }
 
-        /* --- Profile & Zootopia Theme --- */
+        /* --- Profile & Footer --- */
         .profile-pic {
             width: 130px; height: 130px; border-radius: 50%; object-fit: cover;
             border: 5px solid white; box-shadow: 0 8px 20px rgba(0,0,0,0.1);
@@ -143,21 +241,27 @@
         }
 
         @keyframes floatBalloon { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-
     </style>
 </head>
 <body>
 
-    <div class="hearts-bg" id="hearts-bg"></div>
+    <div class="bg-layer" id="hearts-bg"></div>
+    <div class="bg-layer" id="sparkles-bg"></div>
 
     <div class="container">
 
         <div class="screen active" id="s1">
-            <h1>Hey Birthday Girl! ✨</h1>
-            <div class="card">
-                <p>I built a little corner of the internet just for you.</p>
-                <p style="font-size: 0.9rem; font-weight: 400;">(Don't judge my coding skills, judge the effort 😉)</p>
-                <button class="btn" onclick="next(2)">Enter Here ➡️</button>
+            <div class="gaming-grid"></div>
+            
+            <h1>Player Ready? 🎮</h1>
+            <div class="card typewriter">
+                <p>TARGET: SWATI (AKA TRUDY)</p>
+                <p class="highlight" style="margin-top:5px;">MISSION: BIRTHDAY PROTOCOL</p>
+                <hr>
+                <p style="white-space: normal; font-size: 0.85rem; font-family: 'Varela Round', sans-serif; color: #ddd;">
+                    ⚠️ Warning: Entering High Cuteness Zone.
+                </p>
+                <button class="btn" onclick="next(2)">START GAME 🚀</button>
             </div>
         </div>
 
@@ -177,23 +281,23 @@
                     </div>
 
                     <div class="secret-message" id="secret-message">
-                        <h2 style="color: var(--pink-deep); margin-bottom: 10px;">Found it! 🎯</h2>
-                        <p>You’ve successfully unlocked the path to my... next screen. (What did you think I was gonna say? 😉)</p>
-                        <button class="btn" onclick="next(3)">Move On 🎬</button>
+                        <h2 style="color: var(--pink-deep); margin-bottom: 10px; font-family: 'Chewy', cursive;">Found it! 🎯</h2>
+                        <p>You’ve unlocked the path to the next level. (Good job, SWTU ! 😉)</p>
+                        <button class="btn" onclick="next(3)">Moveing On</button>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="screen" id="s3">
-            <h1 style="font-size: 2.2rem;">Main Character Energy 🎥</h1>
+            <h1 style="font-size: 2.5rem;">Main Character Vibes ✨</h1>
             <div class="card" style="padding:15px;">
                 <div class="video-box">
                     <video controls playsinline>
                         <source src="birthday_video.mp4" type="video/mp4">
                     </video>
                 </div>
-                <button class="btn" style="width:100%; margin-top:15px;" onclick="next(4)">One Last Thing 📝</button>
+                <button class="btn" style="width:100%; margin-top:15px;" onclick="next(4)">Aage Chale Ma'am? 💃</button>
             </div>
         </div>
 
@@ -217,11 +321,14 @@
             <div class="card">
                 <img src="https://via.placeholder.com/150" class="profile-pic" alt="Trudy's Pic">
                 
-                <h3 style="color: var(--pink-deep); font-family: 'Pacifico';">To my Trudy 🐰</h3>
+                <h3 style="color: var(--pink-deep); font-family: 'Chewy', cursive;">To Trudy Cabbagepatch 🐰</h3>
                 <p style="font-size: 1rem; margin-top: 15px;">
-                    Happy Birthday to the Judy Hopps of my life. You might be a "dumb bunny" sometimes, but you're my favorite bunny.
+                    Happiest Birthday to <b>
+  </b><b>Swati Swostisudha Biswal</b>.
+                    <br>You might be a "dumb bunny" sometimes 😁, but a cute little fun bunny.From slaying outfits to , you make everything look fun.
+Never stop exploring, trying new things,
                     <br><br>
-                    Stay iconic, stay dramatic, and keep smiling.
+                    Stay iconic, stay dramatic, and please... thoda khana peena time pe kiya karo! 🥕
                 </p>
                 
                 <div class="srk-quote">
@@ -250,10 +357,8 @@
         el.classList.add('popped');
         popped++;
         
-        // Haptic
         if(navigator.vibrate) navigator.vibrate(40);
         
-        // Confetti at balloon
         let rect = el.getBoundingClientRect();
         confetti({
             particleCount: 20, spread: 40, 
@@ -261,41 +366,31 @@
             colors: ['#ff8fa3', '#fff']
         });
 
-        // REVEAL LOGIC
         if(popped === 6) {
             setTimeout(() => {
                 const grid = document.getElementById('balloon-grid');
                 const msg = document.getElementById('secret-message');
-                
-                // Hide grid
                 grid.style.opacity = '0';
                 grid.style.pointerEvents = 'none';
-                
-                // Show message
                 msg.style.opacity = '1';
                 msg.style.transform = 'scale(1)';
-                msg.style.zIndex = '10'; // Bring to front
+                msg.style.zIndex = '10';
             }, 300);
         }
     }
 
     // --- Quiz Logic ---
     function check(el) {
-        // Highlight logic
         document.querySelectorAll('.option').forEach(o => o.classList.remove('correct'));
         el.classList.add('correct');
         el.innerText += " ✅";
-        
         confetti({ particleCount: 30, spread: 50, origin: { y: 0.7 } });
-        
-        setTimeout(() => { 
-            document.getElementById('quiz-btn').style.display = 'block'; 
-        }, 300);
+        setTimeout(() => { document.getElementById('quiz-btn').style.display = 'block'; }, 300);
     }
 
     // --- Celebration ---
     function celebrate() {
-        alert("Happy Birthday Trudy! 🐰🥕");
+        alert("Wishes Sent! 🐰🥕");
         confettiEffect();
     }
 
@@ -309,32 +404,49 @@
         }());
     }
 
-    // --- Floating Hearts Background ---
+    // --- Background Layer 1: Floating Hearts ---
     function createHeart() {
         const heart = document.createElement('div');
-        // Mix of Hearts and maybe a carrot/bunny for Zootopia easter egg sometimes
-        const icons = ['❤️', '❤️', '✨', '🌸']; 
+        const icons = ['❤️', '✨', '🌸', '🐰']; 
         heart.innerHTML = icons[Math.floor(Math.random() * icons.length)];
-        
         heart.style.position = 'fixed';
         heart.style.left = Math.random() * 100 + 'vw';
         heart.style.top = '100vh';
-        heart.style.fontSize = (Math.random() * 20 + 15) + 'px';
+        heart.style.fontSize = (Math.random() * 20 + 10) + 'px';
         heart.style.opacity = Math.random() * 0.5 + 0.3; 
-        heart.style.transition = 'top 5s linear, opacity 5s ease';
-        heart.style.zIndex = '-1';
+        heart.style.transition = 'top 6s linear, opacity 6s ease';
         
         document.getElementById('hearts-bg').appendChild(heart);
 
-        setTimeout(() => {
-            heart.style.top = '-50px';
-            heart.style.opacity = '0';
-        }, 100);
-
-        setTimeout(() => { heart.remove(); }, 5000);
+        setTimeout(() => { heart.style.top = '-50px'; heart.style.opacity = '0'; }, 100);
+        setTimeout(() => { heart.remove(); }, 6000);
     }
+    // Faster creation for fuller background
+    setInterval(createHeart, 300);
 
-    setInterval(createHeart, 400);
+    // --- Background Layer 2: Twinkling Sparkles ---
+    function createSparkle() {
+        const sparkle = document.createElement('div');
+        sparkle.innerHTML = '.';
+        sparkle.style.position = 'fixed';
+        sparkle.style.left = Math.random() * 100 + 'vw';
+        sparkle.style.top = Math.random() * 100 + 'vh'; // Random spot on screen
+        sparkle.style.width = (Math.random() * 5 + 2) + 'px';
+        sparkle.style.height = sparkle.style.width;
+        sparkle.style.background = 'white';
+        sparkle.style.borderRadius = '50%';
+        sparkle.style.boxShadow = '0 0 5px white';
+        sparkle.style.opacity = '0';
+        sparkle.style.transition = 'opacity 1s ease-in-out';
+        
+        document.getElementById('sparkles-bg').appendChild(sparkle);
+
+        // Fade in then out
+        setTimeout(() => { sparkle.style.opacity = Math.random() * 0.7 + 0.3; }, 100);
+        setTimeout(() => { sparkle.style.opacity = '0'; }, 1500);
+        setTimeout(() => { sparkle.remove(); }, 2500);
+    }
+    setInterval(createSparkle, 200);
 
 </script>
 </body>
