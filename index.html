@@ -195,13 +195,12 @@
         }
         .balloon.popped { transform: scale(1.2); opacity: 0; pointer-events: none; }
 
-        /* --- VIDEO OPTIMIZATION (THE FIX) --- */
+        /* --- VIDEO OPTIMIZATION --- */
         .video-container {
             width: 100%;
-            max-width: 320px; /* Perfect width for mobile reels */
+            max-width: 320px;
             margin: 0 auto;
             position: relative;
-            /* Smart Height: Tries to be 140% tall (Reel), but capped at 50% of screen height */
             padding-bottom: min(140%, 50vh); 
             height: 0;
             overflow: hidden;
@@ -215,7 +214,7 @@
             position: absolute;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            object-fit: cover; /* Ensures Reel fills space */
+            object-fit: cover;
         }
 
         /* --- Quiz & Profile --- */
@@ -262,7 +261,7 @@
             <div class="content-wrapper">
                 <h1>Player Ready? 🎮</h1>
                 <div class="card typewriter">
-                    <p>TARGET: SWATI (AKA TRUDY)</p>
+                    <p>TARGET: SWATI (AKA TRUDY🐰)</p>
                     <p class="highlight" style="margin-top:5px;">MISSION: BIRTHDAY PROTOCOL</p>
                     <hr>
                     <p style="white-space: normal; font-size: 0.85rem; font-family: 'Varela Round', sans-serif; color: #ddd;">
@@ -307,7 +306,7 @@
                             Your browser does not support the video tag.
                         </video>
                     </div>
-                    <button class="btn" onclick="next(4)">Aage Chale Ma'am? 💃</button>
+                    <button class="btn" id="video-btn" onclick="catchButton()">Aage Chale Ma'am? 💃</button>
                 </div>
             </div>
         </div>
@@ -344,7 +343,7 @@
                     </p>
                     
                     <div class="srk-quote">
-                        "Tujhe dekha to yeh jaana sanam... ki Birthday hai aaj!" (SRK style) ✨
+                        "Tujhe dekha to yeh jaana sanam... ki Birthday hai aaj!" 💖💄✨
                     </div>
 
                     <button class="btn" onclick="celebrate()">Make a Wish ✨</button>
@@ -385,6 +384,47 @@
                 msg.style.zIndex = '10';
             }, 300);
         }
+    }
+
+    /* --- New Logic for Video Button Chase --- */
+    let btnClicks = 0;
+    function catchButton() {
+        btnClicks++;
+        
+        // If clicked 4 times, proceed to next page
+        if (btnClicks >= 4) {
+            next(4);
+            return;
+        }
+
+        // Otherwise, move to random position
+        const btn = document.getElementById('video-btn');
+        const card = btn.closest('.card');
+        const cardRect = card.getBoundingClientRect();
+        const btnRect = btn.getBoundingClientRect();
+
+        // Calculate boundaries within the card (avoiding going off edges)
+        // We assume 20px padding from edge of card
+        const maxLeft = cardRect.width - btnRect.width - 20;
+        const maxTop = cardRect.height - btnRect.height - 20;
+        
+        const randomLeft = Math.floor(Math.random() * (maxLeft - 20) + 20);
+        const randomTop = Math.floor(Math.random() * (maxTop - 20) + 20);
+
+        btn.style.position = 'absolute'; // Make it float relative to card
+        btn.style.transition = 'all 0.3s ease'; // Smooth movement
+        btn.style.left = randomLeft + 'px';
+        btn.style.top = randomTop + 'px';
+        btn.style.width = 'auto'; // Prevent it from being full width
+        btn.style.marginTop = '0'; // Remove top margin
+        
+        // Optional: Change text for fun
+        const texts = ["Pakad ke dikha! 😜", "Nope! 😂", "Try Again! 👻"];
+        if(btnClicks <= 3) {
+            btn.innerText = texts[btnClicks-1];
+        }
+        
+        if(navigator.vibrate) navigator.vibrate(50);
     }
 
     function check(el) {
